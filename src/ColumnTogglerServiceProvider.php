@@ -25,7 +25,6 @@ class ColumnTogglerServiceProvider extends ServiceProvider
         Nova::serving(function (ServingNova $event): void {
 
             Nova::script('column-toggler', __DIR__ . '/../dist/js/tool.js');
-            Nova::style('column-toggler', __DIR__ . '/../dist/css/tool.css');
 
         });
     }
