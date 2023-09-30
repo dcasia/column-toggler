@@ -5,8 +5,8 @@
 [![License](https://img.shields.io/packagist/l/digital-creative/column-toggler)](https://github.com/dcasia/column-toggler/blob/master/LICENSE)
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/dcasia/resource-navigation-tab/main/screenshots/dark.png">
-  <img alt="Column Toggler in Action" src="https://raw.githubusercontent.com/dcasia/resource-navigation-tab/main/screenshots/light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/dcasia/column-toggler/main/screenshots/dark.png">
+  <img alt="Column Toggler in Action" src="https://raw.githubusercontent.com/dcasia/column-toggler/main/screenshots/light.png">
 </picture>
 
 This package provides the ability to toggle columns in the index view of any resource.
@@ -62,8 +62,8 @@ public function fieldsForIndex(NovaRequest $request): array
 Done, now a new icon will appear in the top right corner of any table resource.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/dcasia/resource-navigation-tab/main/screenshots/bar-dark.png">
-  <img alt="Column Toggler in Action" src="https://raw.githubusercontent.com/dcasia/resource-navigation-tab/main/screenshots/bar-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/dcasia/column-toggler/main/screenshots/bar-dark.png">
+  <img alt="Column Toggler in Action" src="https://raw.githubusercontent.com/dcasia/column-toggler/main/screenshots/bar-light.png">
 </picture>
 
 ## License
