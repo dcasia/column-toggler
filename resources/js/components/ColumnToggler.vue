@@ -153,7 +153,7 @@
             if (normalized.length) {
                 config.params[ columnAttributeName ] = encode(normalized)
             } else {
-                config.params[ columnAttributeName ] = [ '__invalid_attribute__' ]
+                config.params[ columnAttributeName ] = false
             }
 
         }

@@ -18,8 +18,9 @@
     import ColumnToggler from './ColumnToggler.vue'
 
     export default {
-        extends: OriginalFilterMenu,
         name: 'FilterMenu',
+        emits: OriginalFilterMenu.emits,
+        props: OriginalFilterMenu.props,
         components: { OriginalFilterMenu, ColumnToggler },
     }
 

@@ -20,11 +20,13 @@ trait ColumnTogglerTrait
             value: $request->has('column-toggler') && !$request->routeIs('nova.column-toggler.fields'),
             callback: function (FieldCollection $fields) use ($request) {
 
+                $value = $request->input('column-toggler');
+
                 /**
                  * If the value is a boolean we return all fields, since this is the very first request
                  * we don't have any columns to filter by yet.
                  */
-                if ($request->boolean('column-toggler')) {
+                if ($value === 'true') {
 
                     return $fields->filter(function (Field $field) {
                         return data_get($field->meta(), 'columnToggleVisible', true);
@@ -32,7 +34,11 @@ trait ColumnTogglerTrait
 
                 }
 
-                $columns = collect(json_decode(base64_decode($request->input('column-toggler'))));
+                if ($value === 'false') {
+                    return new FieldCollection();
+                }
+
+                $columns = collect(json_decode(base64_decode($value)));
 
                 return $fields->filter(function (Field $field) use ($columns) {
                     return $columns->contains($field->attribute);
