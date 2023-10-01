@@ -32,7 +32,7 @@ trait ColumnTogglerTrait
 
                 }
 
-                $columns = $request->collect('column-toggler');
+                $columns = collect(json_decode(base64_decode($request->input('column-toggler'))));
 
                 return $fields->filter(function (Field $field) use ($columns) {
                     return $columns->contains($field->attribute);

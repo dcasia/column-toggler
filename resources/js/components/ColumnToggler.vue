@@ -114,23 +114,28 @@
     }
 
     function getStateFromLocalStorage(cacheKey) {
-        return JSON.parse(localStorage.getItem(cacheKey))
+        return decode(localStorage.getItem(cacheKey))
     }
 
     function saveStateToLocalStorage(state, cacheKey) {
-        localStorage.setItem(cacheKey, JSON.stringify(state))
+        localStorage.setItem(cacheKey, encode(state))
     }
 
     function normalizeState(state) {
         return Object.keys(state).filter(key => state[ key ].visible)
     }
 
+    function encode(state) {
+        return btoa(JSON.stringify(state))
+    }
+
+    function decode(state) {
+        return state ? JSON.parse(atob(state)) : null
+    }
+
     interceptors.push(config => {
 
-        /**
-         * If we are not on the index page, we don't need to do anything.
-         */
-        if (Nova.$router.page.component !== 'Nova.Index') {
+        if (config.url !== `/nova-api/${ Nova.$router.page.props.resourceName }`) {
             return config
         }
 
@@ -146,7 +151,7 @@
             const normalized = normalizeState(state)
 
             if (normalized.length) {
-                config.params[ columnAttributeName ] = normalized
+                config.params[ columnAttributeName ] = encode(normalized)
             } else {
                 config.params[ columnAttributeName ] = [ '__invalid_attribute__' ]
             }
