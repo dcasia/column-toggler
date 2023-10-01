@@ -133,6 +133,10 @@
         return state ? JSON.parse(atob(state)) : null
     }
 
+    function cacheKey() {
+        return `${ window.location.pathname }/columns-toggler`
+    }
+
     interceptors.push(config => {
 
         if (config.url !== `/nova-api/${ Nova.$router.page.props.resourceName }`) {
@@ -143,8 +147,7 @@
             config.params = {}
         }
 
-        const cacheKey = `${ Nova.$router.page.props.resourceName }-columns-toggler`
-        const state = getStateFromLocalStorage(cacheKey)
+        const state = getStateFromLocalStorage(cacheKey())
 
         if (state) {
 
@@ -172,15 +175,25 @@
         emits: [ 'refresh-resources' ],
         data() {
             return {
+                appendToRequestCallback: null,
+                extraParams: {},
                 state: {},
                 originalState: {},
             }
         },
         mounted() {
 
-            Nova.request().get(`/nova-vendor/column-toggler/fields/${ this.resourceName }`).then(({ data }) => {
+            Nova.$on('custom-relationship-field:extra-params', this.appendToRequestCallback = value => {
+                this.extraParams = { ...this.extraParams, ...value }
+            })
 
-                let localStorageState = getStateFromLocalStorage(this.cacheKey)
+            Nova.$emit('custom-relationship-field:request-extra-params')
+
+            const queryString = new URLSearchParams(this.extraParams)
+
+            Nova.request().get(`/nova-vendor/column-toggler/fields/${ this.resourceName }?${ queryString }`).then(({ data }) => {
+
+                let localStorageState = getStateFromLocalStorage(cacheKey())
 
                 if (localStorageState && this.isDifferentState(data.attributes, localStorageState)) {
 
@@ -196,10 +209,10 @@
             })
 
         },
+        unmounted() {
+            Nova.$off('custom-relationship-field:extra-params', this.appendToRequestCallback)
+        },
         computed: {
-            cacheKey() {
-                return `${ this.resourceName }-columns-toggler`
-            },
             dirtyCount() {
                 return Object.keys(this.state).filter(key => this.state[ key ].visible !== this.originalState[ key ].visible).length
             },
@@ -220,7 +233,7 @@
         watch: {
             state: {
                 handler(state) {
-                    saveStateToLocalStorage(state, this.cacheKey)
+                    saveStateToLocalStorage(state, cacheKey())
                 },
                 deep: true,
             },
