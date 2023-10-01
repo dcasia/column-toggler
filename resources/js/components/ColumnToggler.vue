@@ -74,19 +74,15 @@
 
     </Dropdown>
 
-    <OriginalFilterMenu v-bind="$props" @clear-selected-filters="$emit('clear-selected-filters')"/>
-
 </template>
 
 <script>
-
-    import OriginalFilterMenu from '@/components/FilterMenu.vue'
 
     const novaRequest = Nova.request
 
     const interceptors = []
     const interceptorsInstance = []
-    const columnAttributeName = 'column-toggler'
+    const columnAttributeName = 'columnToggler'
 
     Nova.request = (...params) => {
 
@@ -118,23 +114,32 @@
     }
 
     function getStateFromLocalStorage(cacheKey) {
-        return JSON.parse(localStorage.getItem(cacheKey))
+        return decode(localStorage.getItem(cacheKey))
     }
 
     function saveStateToLocalStorage(state, cacheKey) {
-        localStorage.setItem(cacheKey, JSON.stringify(state))
+        localStorage.setItem(cacheKey, encode(state))
     }
 
     function normalizeState(state) {
         return Object.keys(state).filter(key => state[ key ].visible)
     }
 
+    function encode(state) {
+        return btoa(JSON.stringify(state))
+    }
+
+    function decode(state) {
+        return state ? JSON.parse(atob(state)) : null
+    }
+
+    function cacheKey() {
+        return `${ window.location.pathname }/columns-toggler`
+    }
+
     interceptors.push(config => {
 
-        /**
-         * If we are not on the index page, we don't need to do anything.
-         */
-        if (Nova.$router.page.component !== 'Nova.Index') {
+        if (config.url !== `/nova-api/${ Nova.$router.page.props.resourceName }`) {
             return config
         }
 
@@ -142,17 +147,16 @@
             config.params = {}
         }
 
-        const cacheKey = `${ Nova.$router.page.props.resourceName }-columns-toggler`
-        const state = getStateFromLocalStorage(cacheKey)
+        const state = getStateFromLocalStorage(cacheKey())
 
         if (state) {
 
             const normalized = normalizeState(state)
 
             if (normalized.length) {
-                config.params[ columnAttributeName ] = normalized
+                config.params[ columnAttributeName ] = encode(normalized)
             } else {
-                config.params[ columnAttributeName ] = [ '__invalid_attribute__' ]
+                config.params[ columnAttributeName ] = false
             }
 
         }
@@ -166,28 +170,30 @@
     })
 
     export default {
-        name: 'CustomFilterMenu',
-        components: { OriginalFilterMenu },
-        props: {
-            resourceName: String,
-            lens: { type: String, default: '' },
-            viaResource: String,
-            softDeletes: Boolean,
-            trashed: { type: String, validator: value => [ '', 'with', 'only' ].indexOf(value) !== -1 },
-            perPage: [ String, Number ],
-            perPageOptions: Array,
-        },
+        name: 'ColumnToggler',
+        props: [ 'resourceName' ],
+        emits: [ 'refresh-resources' ],
         data() {
             return {
+                appendToRequestCallback: null,
+                extraParams: {},
                 state: {},
                 originalState: {},
             }
         },
         mounted() {
 
-            Nova.request().get('/nova-vendor/column-toggler/fields/' + this.resourceName).then(({ data }) => {
+            Nova.$on('custom-relationship-field:extra-params', this.appendToRequestCallback = value => {
+                this.extraParams = { ...this.extraParams, ...value }
+            })
 
-                let localStorageState = getStateFromLocalStorage(this.cacheKey)
+            Nova.$emit('custom-relationship-field:request-extra-params')
+
+            const queryString = new URLSearchParams(this.extraParams)
+
+            Nova.request().get(`/nova-vendor/column-toggler/fields/${ this.resourceName }?${ queryString }`).then(({ data }) => {
+
+                let localStorageState = getStateFromLocalStorage(cacheKey())
 
                 if (localStorageState && this.isDifferentState(data.attributes, localStorageState)) {
 
@@ -203,10 +209,10 @@
             })
 
         },
+        unmounted() {
+            Nova.$off('custom-relationship-field:extra-params', this.appendToRequestCallback)
+        },
         computed: {
-            cacheKey() {
-                return `${ this.resourceName }-columns-toggler`
-            },
             dirtyCount() {
                 return Object.keys(this.state).filter(key => this.state[ key ].visible !== this.originalState[ key ].visible).length
             },
@@ -227,7 +233,7 @@
         watch: {
             state: {
                 handler(state) {
-                    saveStateToLocalStorage(state, this.cacheKey)
+                    saveStateToLocalStorage(state, cacheKey())
                 },
                 deep: true,
             },
