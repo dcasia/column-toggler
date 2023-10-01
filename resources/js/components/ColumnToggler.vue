@@ -134,7 +134,17 @@
     }
 
     function cacheKey() {
-        return `${ window.location.href }/columns-toggler`
+
+        const breadcrumbs = Nova.store.state.breadcrumbs.map(({ path }) => path).join('-')
+        const type = Nova.$router.page.component
+        const url = Nova.$router.page.url
+
+        if (type === 'Nova.Lens') {
+            return `${ type }/${ url }/columns-toggler`
+        }
+
+        return `${ type }/${ breadcrumbs }/columns-toggler`
+
     }
 
     interceptors.push(config => {
