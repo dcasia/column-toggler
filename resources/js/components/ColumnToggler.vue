@@ -74,13 +74,9 @@
 
     </Dropdown>
 
-    <OriginalFilterMenu v-bind="$props" @clear-selected-filters="$emit('clear-selected-filters')"/>
-
 </template>
 
 <script>
-
-    import OriginalFilterMenu from '@/components/FilterMenu.vue'
 
     const novaRequest = Nova.request
 
@@ -166,17 +162,9 @@
     })
 
     export default {
-        name: 'CustomFilterMenu',
-        components: { OriginalFilterMenu },
-        props: {
-            resourceName: String,
-            lens: { type: String, default: '' },
-            viaResource: String,
-            softDeletes: Boolean,
-            trashed: { type: String, validator: value => [ '', 'with', 'only' ].indexOf(value) !== -1 },
-            perPage: [ String, Number ],
-            perPageOptions: Array,
-        },
+        name: 'ColumnToggler',
+        props: [ 'resourceName' ],
+        emits: [ 'refresh-resources' ],
         data() {
             return {
                 state: {},
@@ -185,7 +173,7 @@
         },
         mounted() {
 
-            Nova.request().get('/nova-vendor/column-toggler/fields/' + this.resourceName).then(({ data }) => {
+            Nova.request().get(`/nova-vendor/column-toggler/fields/${ this.resourceName }`).then(({ data }) => {
 
                 let localStorageState = getStateFromLocalStorage(this.cacheKey)
 

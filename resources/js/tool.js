@@ -1,5 +1,5 @@
-import CustomFilterMenu from './components/CustomFilterMenu.vue'
+import FilterMenu from './components/FilterMenu.vue'
 
-Nova.booting((app, store) => {
-    app.component('FilterMenu', CustomFilterMenu)
+Nova.booting(app => {
+    app.component('FilterMenu', FilterMenu)
 })
