@@ -134,14 +134,10 @@
     }
 
     function cacheKey() {
-        return `${ window.location.pathname }/columns-toggler`
+        return `${ window.location.href }/columns-toggler`
     }
 
     interceptors.push(config => {
-
-        if (config.url !== `/nova-api/${ Nova.$router.page.props.resourceName }`) {
-            return config
-        }
 
         if (config.params === undefined || config.params === null) {
             config.params = {}
