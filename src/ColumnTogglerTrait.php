@@ -17,10 +17,10 @@ trait ColumnTogglerTrait
     public function indexFields(NovaRequest $request): FieldCollection
     {
         return parent::indexFields($request)->when(
-            value: $request->has('column-toggler') && !$request->routeIs('nova.column-toggler.fields'),
+            value: $request->has('columnToggler') && !$request->routeIs('nova.column-toggler.fields'),
             callback: function (FieldCollection $fields) use ($request) {
 
-                $value = $request->input('column-toggler');
+                $value = $request->input('columnToggler');
 
                 /**
                  * If the value is a boolean we return all fields, since this is the very first request

@@ -82,7 +82,7 @@
 
     const interceptors = []
     const interceptorsInstance = []
-    const columnAttributeName = 'column-toggler'
+    const columnAttributeName = 'columnToggler'
 
     Nova.request = (...params) => {
 
