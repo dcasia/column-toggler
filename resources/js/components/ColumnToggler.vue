@@ -78,107 +78,11 @@
 
 <script>
 
-    const novaRequest = Nova.request
-
-    const interceptors = []
-    const interceptorsInstance = []
-    const columnAttributeName = 'columnToggler'
-
-    Nova.request = (...params) => {
-
-        for (const param of params) {
-
-            for (const interceptor of interceptors) {
-                interceptor(param)
-            }
-
-        }
-
-        const axiosInstance = novaRequest(...params)
-
-        if (axiosInstance instanceof Promise) {
-            return axiosInstance
-        }
-
-        for (const interceptor of interceptors) {
-
-            interceptorsInstance.push({
-                instance: axiosInstance,
-                interceptor: axiosInstance.interceptors.request.use(config => interceptor(config)),
-            })
-
-        }
-
-        return axiosInstance
-
-    }
-
-    function getStateFromLocalStorage(cacheKey) {
-        return decode(localStorage.getItem(cacheKey))
-    }
-
-    function saveStateToLocalStorage(state, cacheKey) {
-        localStorage.setItem(cacheKey, encode(state))
-    }
-
-    function normalizeState(state) {
-        return Object.keys(state).filter(key => state[ key ].visible)
-    }
-
-    function encode(state) {
-        return btoa(JSON.stringify(state))
-    }
-
-    function decode(state) {
-        return state ? JSON.parse(atob(state)) : null
-    }
-
-    function cacheKey() {
-
-        const breadcrumbs = Nova.store.state.breadcrumbs.map(({ path }) => path).join('-')
-        const type = Nova.$router.page.component
-        const url = Nova.$router.page.url
-
-        if (type === 'Nova.Lens') {
-            return `${ type }/${ url }/columns-toggler`
-        }
-
-        return `${ type }/${ breadcrumbs }/columns-toggler`
-
-    }
-
-    interceptors.push(config => {
-
-        if (config.params === undefined || config.params === null) {
-            config.params = {}
-        }
-
-        const state = getStateFromLocalStorage(cacheKey())
-
-        if (state) {
-
-            const normalized = normalizeState(state)
-
-            if (normalized.length) {
-                config.params[ columnAttributeName ] = encode(normalized)
-            } else {
-                config.params[ columnAttributeName ] = false
-            }
-
-        }
-
-        if (!config.params.hasOwnProperty(columnAttributeName)) {
-            config.params[ columnAttributeName ] = true
-        }
-
-        return config
-
-    })
+    import { getStateFromLocalStorage } from './ColumToggler'
 
     export default {
         name: 'ColumnToggler',
         props: [ 'resourceName' ],
-        emits: [ 'refresh-resources' ],
         data() {
             return {
                 appendToRequestCallback: null,
@@ -199,14 +103,10 @@
 
             Nova.request().get(`/nova-vendor/column-toggler/fields/${ this.resourceName }?${ queryString }`).then(({ data }) => {
 
-                let localStorageState = getStateFromLocalStorage(cacheKey())
+                let localStorageState = getStateFromLocalStorage(this.resourceName)
 
                 if (localStorageState && this.isDifferentState(data.attributes, localStorageState)) {
-
                     localStorageState = data.attributes
-
-                    Nova.$emit('refresh-resources')
-
                 }
 
                 this.originalState = JSON.parse(JSON.stringify(data.attributes))
@@ -220,7 +120,11 @@
         },
         computed: {
             dirtyCount() {
-                return Object.keys(this.state).filter(key => this.state[ key ].visible !== this.originalState[ key ].visible).length
+
+                return Object
+                    .keys(this.state)
+                    .filter(key => this.state[ key ].visible !== this.originalState[ key ].visible).length
+
             },
             isDirty() {
 
@@ -238,10 +142,10 @@
         },
         watch: {
             state: {
-                handler(state) {
-                    saveStateToLocalStorage(state, cacheKey())
-                },
                 deep: true,
+                handler(state) {
+                    Nova.$emit(`column-toggler:state-changed:${ this.resourceName }`, state)
+                },
             },
         },
         methods: {
@@ -258,18 +162,10 @@
 
             },
             handleRestoreDefaultClick() {
-
                 this.state = JSON.parse(JSON.stringify(this.originalState))
-
-                Nova.$emit('refresh-resources')
-
             },
             updateCheckedState(attribute, checked) {
-
                 this.state[ attribute ].visible = checked
-
-                Nova.$emit('refresh-resources')
-
             },
         },
     }
