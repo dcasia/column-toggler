@@ -79,6 +79,7 @@
 <script>
 
     import { getStateFromLocalStorage } from './ColumToggler'
+    import cloneDeep from 'lodash/cloneDeep'
 
     export default {
         name: 'ColumnToggler',
@@ -109,7 +110,7 @@
                     localStorageState = data.attributes
                 }
 
-                this.originalState = JSON.parse(JSON.stringify(data.attributes))
+                this.originalState = cloneDeep(data.attributes)
                 this.state = localStorageState ?? data.attributes
 
             })
@@ -162,7 +163,7 @@
 
             },
             handleRestoreDefaultClick() {
-                this.state = JSON.parse(JSON.stringify(this.originalState))
+                this.state = cloneDeep(this.originalState)
             },
             updateCheckedState(attribute, checked) {
                 this.state[ attribute ].visible = checked

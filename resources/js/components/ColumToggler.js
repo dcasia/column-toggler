@@ -23,9 +23,7 @@ export function saveStateToLocalStorage(state, cacheKey) {
 }
 
 export function generateCacheKey(cacheKey) {
-
     return `column-toggler/${ cacheKey }/${ Nova.$router.page.component }`
-
 }
 
 export function decode(state) {
@@ -34,7 +32,7 @@ export function decode(state) {
 
 export function registerMixin(component) {
 
-    const original = component.computed.resourceRequestQueryString
+    const originalResourceRequestQueryString = component.computed.resourceRequestQueryString
 
     component.mixins.push({
         mounted() {
@@ -44,7 +42,6 @@ export function registerMixin(component) {
             Nova.$off(`column-toggler:state-changed:${ this.resourceName }`, this.onColumTogglerStateChange)
         },
         data() {
-            console.log('first')
             return {
                 columnTogglerState: getStateFromLocalStorage(this.resourceName),
             }
@@ -77,7 +74,7 @@ export function registerMixin(component) {
 
     component.computed.resourceRequestQueryString = function () {
         return {
-            ...original.call(this),
+            ...originalResourceRequestQueryString.call(this),
             columnToggler: this.encodedColumnTogglerColumns,
         }
     }
