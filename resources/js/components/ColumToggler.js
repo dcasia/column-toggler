@@ -3,7 +3,7 @@ export function toList(state) {
 }
 
 export function encode(state) {
-    return btoa(JSON.stringify(state))
+    return btoa(unescape(encodeURIComponent(JSON.stringify(state))));
 }
 
 export function getStateFromLocalStorage(cacheKey) {
@@ -27,7 +27,7 @@ export function generateCacheKey(cacheKey) {
 }
 
 export function decode(state) {
-    return state ? JSON.parse(atob(state)) : null
+    return state ? JSON.parse(decodeURIComponent(escape(atob(state)))) : null;
 }
 
 export function registerMixin(component) {
