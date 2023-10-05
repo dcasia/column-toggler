@@ -2,7 +2,7 @@
 
     <Dropdown
         :handle-internal-clicks="false"
-        class="flex h-9 hover:bg-gray-100 dark:hover:bg-gray-700 rounded mr-2"
+        class="flex h-9 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
         :class="{
             'bg-primary-500 hover:bg-primary-600 border-primary-500': isDirty,
             'dark:bg-primary-500 dark:hover:bg-primary-600 dark:border-primary-500': isDirty,
@@ -78,7 +78,7 @@
 
 <script>
 
-    import { getStateFromLocalStorage } from './ColumToggler'
+    import { getStateFromLocalStorage } from './ColumnToggler'
     import cloneDeep from 'lodash/cloneDeep'
 
     export default {
@@ -86,7 +86,6 @@
         props: [ 'resourceName' ],
         data() {
             return {
-                appendToRequestCallback: null,
                 extraParams: {},
                 state: {},
                 originalState: {},
@@ -94,10 +93,7 @@
         },
         mounted() {
 
-            Nova.$on('custom-relationship-field:extra-params', this.appendToRequestCallback = value => {
-                this.extraParams = { ...this.extraParams, ...value }
-            })
-
+            Nova.$on('custom-relationship-field:extra-params', this.appendToRequestCallback)
             Nova.$emit('custom-relationship-field:request-extra-params')
 
             const queryString = new URLSearchParams(this.extraParams)
@@ -168,7 +164,18 @@
             updateCheckedState(attribute, checked) {
                 this.state[ attribute ].visible = checked
             },
+            appendToRequestCallback(params) {
+                this.extraParams = { ...this.extraParams, ...params }
+            },
         },
     }
 
 </script>
+
+<style>
+
+    #column-toggler ~ div {
+        margin-left: .5rem;
+    }
+
+</style>
