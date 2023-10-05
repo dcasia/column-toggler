@@ -174,10 +174,8 @@
 
 <style>
 
-    #column-toggler {
-        ~ div {
-            margin-left: .5rem;
-        }
+    #column-toggler ~ div {
+        margin-left: .5rem;
     }
 
 </style>
