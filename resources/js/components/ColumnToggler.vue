@@ -139,7 +139,7 @@
             state: {
                 deep: true,
                 handler(state) {
-                    Nova.$emit(`column-toggler:state-changed:${ [ this.tableToolbar.resourceName, this.tableToolbar.lens ].filter(Boolean).join('/') }`, state)
+                    Nova.$emit(`column-toggler:state-changed:${ [ this.tableToolbar.resourceName, this.tableToolbar.lens, this.tableToolbar.actionQueryString?.viaRelationship ].filter(Boolean).join('/') }`, state)
                 },
             },
         },

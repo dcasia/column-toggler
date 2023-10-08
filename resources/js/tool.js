@@ -31,13 +31,23 @@ Nova.booting(app => {
 
             if (this._.type?.__file?.endsWith('ResourceTableToolbar.vue')) {
 
-                const toolbarTarget = '[dusk$="-index-component"] div.h-9.ml-auto.flex.items-center.pr-2.md\\:pr-3 > div.hidden.md\\:flex.px-2'
-                const lensToolbarTarget = '[dusk$="-lens-component"] div.h-9.ml-auto.flex.items-center.pr-2.md\\:pr-3 > div.hidden.md\\:flex.px-2'
-
                 const container = document.createElement('div')
                 container.id = 'column-toggler'
 
-                const element = this._.vnode.el.querySelector(this.isLensView ? lensToolbarTarget : toolbarTarget)
+                const relationship = this.actionQueryString.viaRelationship
+                const resourceName = this.resourceName
+
+                let target
+
+                if (relationship) {
+                    target = `[dusk="${ resourceName }-index-component"][data-relationship="${ relationship }"] div.h-9.ml-auto.flex.items-center.pr-2.md\\:pr-3 > div.hidden.md\\:flex.px-2`
+                } else if (this.isLensView) {
+                    target = `[dusk="${ resourceName }-lens-component"] div.h-9.ml-auto.flex.items-center.pr-2.md\\:pr-3 > div.hidden.md\\:flex.px-2`
+                } else {
+                    target = `[dusk="${ resourceName }-index-component"] div.h-9.ml-auto.flex.items-center.pr-2.md\\:pr-3 > div.hidden.md\\:flex.px-2`
+                }
+
+                const element = this._.vnode.el.querySelector(target)
 
                 if (element) {
 
