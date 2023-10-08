@@ -43,10 +43,7 @@ Nova.booting(app => {
 
                     element.insertAdjacentElement('afterend', container)
 
-                    const vnode = createVNode(ColumnToggler, {
-                        resourceName: this._.props.resourceName,
-                        tableToolbar: this,
-                    })
+                    const vnode = createVNode(ColumnToggler, { tableToolbar: this })
                     vnode.appContext = app._context
 
                     render(vnode, container)

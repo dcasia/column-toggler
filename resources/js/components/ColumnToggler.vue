@@ -88,7 +88,7 @@
 
     export default {
         name: 'ColumnToggler',
-        props: [ 'resourceName', 'tableToolbar' ],
+        props: [ 'tableToolbar' ],
         data() {
             return {
                 state: {},
@@ -124,7 +124,7 @@
 
                 if (attributes) {
 
-                    let localStorageState = getStateFromLocalStorage(this.resourceName)
+                    let localStorageState = getStateFromLocalStorage(this.tableToolbar.resourceName)
 
                     if (localStorageState && this.isDifferentState(attributes, localStorageState)) {
                         localStorageState = attributes
@@ -139,7 +139,7 @@
             state: {
                 deep: true,
                 handler(state) {
-                    Nova.$emit(`column-toggler:state-changed:${ [ this.resourceName, this.tableToolbar.lens ].filter(Boolean).join('/') }`, state)
+                    Nova.$emit(`column-toggler:state-changed:${ [ this.tableToolbar.resourceName, this.tableToolbar.lens ].filter(Boolean).join('/') }`, state)
                 },
             },
         },
