@@ -7,9 +7,9 @@
             :handle-internal-clicks="false"
             class="flex h-9 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
             :class="{
-            'bg-primary-500 hover:bg-primary-600 border-primary-500': isDirty,
-            'dark:bg-primary-500 dark:hover:bg-primary-600 dark:border-primary-500': isDirty,
-        }">
+                'bg-primary-500 hover:bg-primary-600 border-primary-500': isDirty,
+                'dark:bg-primary-500 dark:hover:bg-primary-600 dark:border-primary-500': isDirty,
+            }">
 
             <span class="sr-only">{{ __('Columns Dropdown') }}</span>
 
@@ -23,9 +23,9 @@
                       :class="{ 'text-white dark:text-gray-800': isDirty }"
                       class="ml-2 font-bold">
 
-                {{ dirtyCount }}
+                    {{ dirtyCount }}
 
-            </span>
+                </span>
 
             </DropdownTrigger>
 
