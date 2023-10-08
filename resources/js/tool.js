@@ -34,7 +34,7 @@ Nova.booting(app => {
                 const container = document.createElement('div')
                 container.id = 'column-toggler'
 
-                const relationship = this.actionQueryString.viaRelationship
+                const relationship = this.actionQueryString?.viaRelationship
                 const resourceName = this.resourceName
 
                 let target

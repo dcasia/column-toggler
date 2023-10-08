@@ -74,7 +74,7 @@ export function registerMixin(component) {
         },
         computed: {
             columnTogglerEventKey() {
-                return `column-toggler:state-changed:${ [ this.resourceName, this.lens,this.actionQueryString?.viaRelationship ].filter(Boolean).join('/') }`
+                return `column-toggler:state-changed:${ [ this.resourceName, this.lens, this.actionQueryString?.viaRelationship ].filter(Boolean).join('/') }`
             },
             columnTogglerEncodedColumns() {
 
