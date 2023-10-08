@@ -1,9 +1,16 @@
+import isEqual from 'lodash/isEqual'
+import cloneDeep from 'lodash/cloneDeep'
+
 export function toList(state) {
     return Object.keys(state).filter(key => state[ key ].visible)
 }
 
 export function encode(state) {
-    return btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+    return btoa(unescape(encodeURIComponent(JSON.stringify(state))))
+}
+
+export function decode(state) {
+    return state ? JSON.parse(decodeURIComponent(escape(atob(state)))) : null
 }
 
 export function getStateFromLocalStorage(cacheKey) {
@@ -26,20 +33,20 @@ export function generateCacheKey(cacheKey) {
     return `column-toggler/${ cacheKey }/${ Nova.$router.page.component }`
 }
 
-export function decode(state) {
-    return state ? JSON.parse(decodeURIComponent(escape(atob(state)))) : null;
-}
-
 export function registerMixin(component) {
+
+    if (component.computed.resourceRequestQueryString === undefined) {
+        component = component.mixins.find(({ computed }) => typeof computed.resourceRequestQueryString === 'function')
+    }
 
     const originalResourceRequestQueryString = component.computed.resourceRequestQueryString
 
     component.mixins.push({
-        mounted() {
-            Nova.$on(`column-toggler:state-changed:${ this.resourceName }`, this.onColumTogglerStateChange)
+        created() {
+            Nova.$on(this.columnTogglerEventKey, this.columnTogglerOnStateChange)
         },
         unmounted() {
-            Nova.$off(`column-toggler:state-changed:${ this.resourceName }`, this.onColumTogglerStateChange)
+            Nova.$off(this.columnTogglerEventKey, this.columnTogglerOnStateChange)
         },
         data() {
             return {
@@ -47,14 +54,29 @@ export function registerMixin(component) {
             }
         },
         methods: {
-            onColumTogglerStateChange(state) {
-                saveStateToLocalStorage(state, this.resourceName)
-                this.columnTogglerState = state
-                this.getResources()
+            columnTogglerOnStateChange(state) {
+
+                const currentState = this.columnTogglerState
+
+                if (isEqual(state, currentState) === false) {
+
+                    saveStateToLocalStorage(state, this.resourceName)
+
+                    this.columnTogglerState = cloneDeep(state)
+
+                    if (currentState !== true) {
+                        this.getResources()
+                    }
+
+                }
+
             },
         },
         computed: {
-            encodedColumnTogglerColumns() {
+            columnTogglerEventKey() {
+                return `column-toggler:state-changed:${ [ this.resourceName, this.lens ].filter(Boolean).join('/') }`
+            },
+            columnTogglerEncodedColumns() {
 
                 if (typeof this.columnTogglerState === 'boolean') {
                     return this.columnTogglerState
@@ -75,7 +97,7 @@ export function registerMixin(component) {
     component.computed.resourceRequestQueryString = function () {
         return {
             ...originalResourceRequestQueryString.call(this),
-            columnToggler: this.encodedColumnTogglerColumns,
+            columnToggler: this.columnTogglerEncodedColumns,
         }
     }
 
