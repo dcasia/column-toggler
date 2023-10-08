@@ -14,9 +14,30 @@ use Laravel\Nova\Resource;
  */
 trait ColumnTogglerTrait
 {
+    public function serializeForIndex(NovaRequest $request, $fields = null): array
+    {
+        $indexFields = $fields ?? parent::indexFields($request);
+
+        $columns = $indexFields->mapWithKeys(fn (Field $field) => [
+            $field->attribute => [
+                'label' => $field->name,
+                'visible' => data_get($field->meta(), 'columnToggleVisible', true),
+            ],
+        ]);
+
+        return array_merge(parent::serializeForIndex($request, $this->filterFields($request, $indexFields)), [
+            'columnToggler' => $columns,
+        ]);
+    }
+
     public function indexFields(NovaRequest $request): FieldCollection
     {
-        return parent::indexFields($request)->when(
+        return $this->filterFields($request, parent::indexFields($request));
+    }
+
+    private function filterFields(NovaRequest $request, FieldCollection $fields): FieldCollection
+    {
+        return $fields->when(
             value: $request->has('columnToggler') && !$request->routeIs('nova.column-toggler.fields'),
             callback: function (FieldCollection $fields) use ($request) {
 
