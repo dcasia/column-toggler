@@ -2,7 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/digital-creative/column-toggler)](https://packagist.org/packages/digital-creative/column-toggler)
 [![Total Downloads](https://img.shields.io/packagist/dt/digital-creative/column-toggler)](https://packagist.org/packages/digital-creative/column-toggler)
-[![License](https://img.shields.io/packagist/l/digital-creative/column-toggler)](https://github.com/dcasia/column-toggler/blob/master/LICENSE)
+[![License](https://img.shields.io/packagist/l/digital-creative/column-toggler)](https://github.com/dcasia/column-toggler/blob/main/LICENSE)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/dcasia/column-toggler/main/screenshots/dark.png">
