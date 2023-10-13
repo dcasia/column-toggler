@@ -2,7 +2,7 @@ import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
 
 export function toList(state) {
-    return Object.keys(state).filter(key => state[ key ].visible)
+    return state.filter(({ visible }) => visible).map(({ attribute }) => attribute)
 }
 
 export function encode(state) {

@@ -53,19 +53,32 @@
                                 {{ __('Toggle Columns') }}
                             </h3>
 
-                            <div class="flex flex-wrap p-4 space-y-1">
+                            <Draggable
+                                v-model="state"
+                                class="flex flex-wrap p-4 space-y-1"
+                                item-key="attribute"
+                                :animation="150">
 
-                                <CheckboxWithLabel
-                                    class="w-full leading-none whitespace-nowrap mr-4"
-                                    v-for="({ label, visible }, attribute) in state"
-                                    :checked="visible"
-                                    @input="updateCheckedState(attribute, $event.target.checked)">
+                                <template #item="{ element }">
 
-                                    <span>{{ label }}</span>
+                                    <CheckboxWithLabel
+                                        class="w-full leading-none whitespace-nowrap"
+                                        :checked="element.visible"
+                                        @input="updateCheckedState(element.attribute, $event.target.checked)">
 
-                                </CheckboxWithLabel>
+                                        <div class="flex justify-between flex-1 items-center">
 
-                            </div>
+                                            <div>{{ element.label }}</div>
+
+                                            <DragIcon class="text-gray-200 dark:text-gray-800" />
+
+                                        </div>
+
+                                    </CheckboxWithLabel>
+
+                                </template>
+
+                            </Draggable>
 
                         </div>
 
@@ -85,17 +98,33 @@
 
     import { getStateFromLocalStorage } from './ColumnToggler'
     import cloneDeep from 'lodash/cloneDeep'
+    import Draggable from 'vuedraggable'
+    import DragIcon from './DragIcon.vue'
 
     export default {
         name: 'ColumnToggler',
+        components: { DragIcon, Draggable },
         props: [ 'tableToolbar' ],
         data() {
             return {
+                stateList: [],
                 state: {},
                 originalState: {},
             }
         },
         computed: {
+
+            myList: {
+                get() {
+                    return Object.keys(this.state)
+                },
+                set(value) {
+                    console.log(this.state)
+                    // this.state = value/
+                    // this.$store.commit('updateList', value)
+                },
+            },
+
             dirtyCount() {
 
                 return Object
@@ -160,7 +189,13 @@
                 this.state = cloneDeep(this.originalState)
             },
             updateCheckedState(attribute, checked) {
-                this.state[ attribute ].visible = checked
+
+                const state = this.state.find(element => element.attribute === attribute)
+
+                if (state) {
+                    state.visible = checked
+                }
+
             },
         },
     }
