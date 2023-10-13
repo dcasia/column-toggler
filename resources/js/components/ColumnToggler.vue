@@ -55,7 +55,7 @@
 
                             <Draggable
                                 v-model="state"
-                                :disabled="config.enable_sorting === false"
+                                :disabled="enableSorting === false"
                                 class="flex flex-wrap p-4 space-y-1"
                                 item-key="attribute"
                                 :animation="150">
@@ -71,7 +71,7 @@
 
                                             <div>{{ element.label }}</div>
 
-                                            <DragIcon v-if="config.enable_sorting" class="text-gray-200 dark:text-gray-800" />
+                                            <DragIcon v-if="enableSorting" class="text-gray-200 dark:text-gray-800"/>
 
                                         </div>
 
@@ -108,25 +108,46 @@
         props: [ 'tableToolbar' ],
         data() {
             return {
-                stateList: [],
                 state: {},
                 originalState: {},
-                config: Nova.config('column_toggler')
+                enableSorting: Nova.config('column_toggler').enable_sorting,
             }
         },
         computed: {
             dirtyCount() {
 
-                return Object
-                    .keys(this.state)
-                    .filter(key => this.state[ key ].visible !== this.originalState[ key ].visible).length
+                const indexes = Object.keys(this.state)
+
+                let count = indexes
+                    .filter(index => this.state[ index ].attribute !== this.originalState[ index ].attribute)
+                    .length ? 1 : 0
+
+                for (const index of indexes) {
+
+                    const original = this.originalState[ index ]
+                    const fromState = this.state.find(item => item.attribute === original.attribute)
+
+                    if (original?.visible !== fromState?.visible) {
+                        count++
+                    }
+
+                }
+
+                return count
 
             },
             isDirty() {
 
-                for (const key in this.originalState) {
+                for (const index in this.originalState) {
 
-                    if (this.originalState[ key ].visible !== this.state[ key ].visible) {
+                    const original = this.originalState[ index ]
+                    const fromState = this.state.find(element => element.attribute === original.attribute)
+
+                    if (original.attribute !== this.state[ index ].attribute) {
+                        return true
+                    }
+
+                    if (original?.visible !== fromState?.visible) {
                         return true
                     }
 
@@ -165,8 +186,8 @@
         methods: {
             isDifferentState(state, cacheState) {
 
-                const stateKeys = Object.keys(state)
-                const cacheStateKeys = Object.keys(cacheState)
+                const stateKeys = state.map(state => state.attribute)
+                const cacheStateKeys = cacheState.map(state => state.attribute)
 
                 if (stateKeys.length !== cacheStateKeys.length) {
                     return true
