@@ -186,6 +186,10 @@
         methods: {
             isDifferentState(state, cacheState) {
 
+                if (!Array.isArray(state) || !Array.isArray(cacheState) || typeof state !== typeof cacheState) {
+                    return true
+                }
+
                 const stateKeys = state.map(state => state.attribute)
                 const cacheStateKeys = cacheState.map(state => state.attribute)
 
