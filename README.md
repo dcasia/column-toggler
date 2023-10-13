@@ -66,6 +66,20 @@ Done, now a new icon will appear in the top right corner of any table resource.
   <img alt="Column Toggler in Action" src="https://raw.githubusercontent.com/dcasia/column-toggler/main/screenshots/bar-light.png">
 </picture>
 
+## Configuration
+
+You can enable / disable column sorting by adding the following to your `config/nova.php` file:
+
+```php
+// config/nova.php
+
+'vendors' => [
+    'column_toggler' => [
+        'enable_sorting' => false,
+    ]
+]
+```
+
 ## ⭐️ Show Your Support
 
 Please give a ⭐️ if this project helped you!

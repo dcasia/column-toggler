@@ -30,7 +30,12 @@ export function saveStateToLocalStorage(state, cacheKey) {
 }
 
 export function generateCacheKey(cacheKey) {
-    return `column-toggler/${ cacheKey }/${ Nova.$router.page.component }`
+    return [
+        'column-toggler',
+        cacheKey,
+        Nova.$router.page.component,
+        Nova.config('column_toggler').enable_sorting,
+    ].join('/')
 }
 
 export function registerMixin(component) {

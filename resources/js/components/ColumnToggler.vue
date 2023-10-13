@@ -55,6 +55,7 @@
 
                             <Draggable
                                 v-model="state"
+                                :disabled="config.enable_sorting === false"
                                 class="flex flex-wrap p-4 space-y-1"
                                 item-key="attribute"
                                 :animation="150">
@@ -70,7 +71,7 @@
 
                                             <div>{{ element.label }}</div>
 
-                                            <DragIcon class="text-gray-200 dark:text-gray-800" />
+                                            <DragIcon v-if="config.enable_sorting" class="text-gray-200 dark:text-gray-800" />
 
                                         </div>
 
@@ -110,6 +111,7 @@
                 stateList: [],
                 state: {},
                 originalState: {},
+                config: Nova.config('column_toggler')
             }
         },
         computed: {
