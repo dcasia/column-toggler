@@ -113,18 +113,6 @@
             }
         },
         computed: {
-
-            myList: {
-                get() {
-                    return Object.keys(this.state)
-                },
-                set(value) {
-                    console.log(this.state)
-                    // this.state = value/
-                    // this.$store.commit('updateList', value)
-                },
-            },
-
             dirtyCount() {
 
                 return Object
