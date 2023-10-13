@@ -18,11 +18,10 @@ trait ColumnTogglerTrait
     {
         $indexFields = $fields ?? parent::indexFields($request);
 
-        $columns = $indexFields->mapWithKeys(fn (Field $field) => [
-            $field->attribute => [
-                'label' => $field->name,
-                'visible' => data_get($field->meta(), 'columnToggleVisible', true),
-            ],
+        $columns = $indexFields->map(fn (Field $field) => [
+            'attribute' => $field->attribute,
+            'label' => $field->name,
+            'visible' => data_get($field->meta(), 'columnToggleVisible', true),
         ]);
 
         return array_merge(parent::serializeForIndex($request, $this->filterFields($request, $indexFields)), [
@@ -61,9 +60,9 @@ trait ColumnTogglerTrait
 
                 $columns = collect(json_decode(base64_decode($value)));
 
-                return $fields->filter(function (Field $field) use ($columns) {
-                    return $columns->contains($field->attribute);
-                });
+                return $fields
+                    ->filter(fn (Field $field) => $columns->contains($field->attribute))
+                    ->sortBy(fn (Field $field) => $columns->search($field->attribute));
 
             },
         )->values();

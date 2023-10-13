@@ -53,19 +53,33 @@
                                 {{ __('Toggle Columns') }}
                             </h3>
 
-                            <div class="flex flex-wrap p-4 space-y-1">
+                            <Draggable
+                                v-model="state"
+                                :disabled="enableSorting === false"
+                                class="flex flex-wrap p-4 space-y-1"
+                                item-key="attribute"
+                                :animation="150">
 
-                                <CheckboxWithLabel
-                                    class="w-full leading-none whitespace-nowrap mr-4"
-                                    v-for="({ label, visible }, attribute) in state"
-                                    :checked="visible"
-                                    @input="updateCheckedState(attribute, $event.target.checked)">
+                                <template #item="{ element }">
 
-                                    <span>{{ label }}</span>
+                                    <CheckboxWithLabel
+                                        class="w-full leading-none whitespace-nowrap"
+                                        :checked="element.visible"
+                                        @input="updateCheckedState(element.attribute, $event.target.checked)">
 
-                                </CheckboxWithLabel>
+                                        <div class="flex justify-between flex-1 items-center">
 
-                            </div>
+                                            <div>{{ element.label }}</div>
+
+                                            <DragIcon v-if="enableSorting" class="text-gray-200 dark:text-gray-800"/>
+
+                                        </div>
+
+                                    </CheckboxWithLabel>
+
+                                </template>
+
+                            </Draggable>
 
                         </div>
 
@@ -85,29 +99,55 @@
 
     import { getStateFromLocalStorage } from './ColumnToggler'
     import cloneDeep from 'lodash/cloneDeep'
+    import Draggable from 'vuedraggable'
+    import DragIcon from './DragIcon.vue'
 
     export default {
         name: 'ColumnToggler',
+        components: { DragIcon, Draggable },
         props: [ 'tableToolbar' ],
         data() {
             return {
                 state: {},
                 originalState: {},
+                enableSorting: Nova.config('column_toggler').enable_sorting,
             }
         },
         computed: {
             dirtyCount() {
 
-                return Object
-                    .keys(this.state)
-                    .filter(key => this.state[ key ].visible !== this.originalState[ key ].visible).length
+                const indexes = Object.keys(this.state)
+
+                let count = indexes
+                    .filter(index => this.state[ index ].attribute !== this.originalState[ index ].attribute)
+                    .length ? 1 : 0
+
+                for (const index of indexes) {
+
+                    const original = this.originalState[ index ]
+                    const fromState = this.state.find(item => item.attribute === original.attribute)
+
+                    if (original?.visible !== fromState?.visible) {
+                        count++
+                    }
+
+                }
+
+                return count
 
             },
             isDirty() {
 
-                for (const key in this.originalState) {
+                for (const index in this.originalState) {
 
-                    if (this.originalState[ key ].visible !== this.state[ key ].visible) {
+                    const original = this.originalState[ index ]
+                    const fromState = this.state.find(element => element.attribute === original.attribute)
+
+                    if (original.attribute !== this.state[ index ].attribute) {
+                        return true
+                    }
+
+                    if (original?.visible !== fromState?.visible) {
                         return true
                     }
 
@@ -146,8 +186,8 @@
         methods: {
             isDifferentState(state, cacheState) {
 
-                const stateKeys = Object.keys(state)
-                const cacheStateKeys = Object.keys(cacheState)
+                const stateKeys = state.map(state => state.attribute)
+                const cacheStateKeys = cacheState.map(state => state.attribute)
 
                 if (stateKeys.length !== cacheStateKeys.length) {
                     return true
@@ -160,7 +200,13 @@
                 this.state = cloneDeep(this.originalState)
             },
             updateCheckedState(attribute, checked) {
-                this.state[ attribute ].visible = checked
+
+                const state = this.state.find(element => element.attribute === attribute)
+
+                if (state) {
+                    state.visible = checked
+                }
+
             },
         },
     }
