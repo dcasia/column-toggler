@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace DigitalCreative\ColumnToggler;
 
@@ -18,7 +18,7 @@ trait ColumnTogglerTrait
     {
         $indexFields = $fields ?? parent::indexFields($request);
 
-        $columns = $indexFields->map(fn(Field $field) => [
+        $columns = $indexFields->map(fn (Field $field) => [
             'attribute' => $field->attribute,
             'label' => $field->name,
             'visible' => data_get($field->meta(), 'columnToggleVisible', true),
@@ -61,8 +61,8 @@ trait ColumnTogglerTrait
                 $columns = collect(json_decode(base64_decode($value)));
 
                 return $fields
-                    ->filter(fn(Field $field) => $columns->contains($field->attribute))
-                    ->sortBy(fn(Field $field) => $columns->search($field->attribute));
+                    ->filter(fn (Field $field) => $columns->contains($field->attribute))
+                    ->sortBy(fn (Field $field) => $columns->search($field->attribute));
 
             },
         )->values();
