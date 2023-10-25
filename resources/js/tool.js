@@ -32,7 +32,7 @@ Nova.booting(app => {
             if (this._.type?.__file?.endsWith('ResourceTableToolbar.vue')) {
 
                 const container = document.createElement('div')
-                container.id = 'column-toggler'
+                container.classList.add('column-toggler')
 
                 const relationship = this.actionQueryString?.viaRelationship
                 const resourceName = this.resourceName
