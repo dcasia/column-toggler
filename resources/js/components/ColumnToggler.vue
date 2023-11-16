@@ -48,6 +48,7 @@
 
                                 <CheckboxWithLabel
                                     class="w-full leading-none whitespace-nowrap"
+                                    v-if="element.label"
                                     :checked="element.visible"
                                     @click.stop
                                     @input="updateCheckedState(element.attribute, $event.target.checked)">
