@@ -14,7 +14,7 @@ use Laravel\Nova\Resource;
  */
 trait ColumnTogglerTrait
 {
-    public function serializeForIndex(NovaRequest $request, $fields = null): array
+    public function serializeForIndex(NovaRequest $request, $fields = null)
     {
         $indexFields = $fields ?? parent::indexFields($request);
 
