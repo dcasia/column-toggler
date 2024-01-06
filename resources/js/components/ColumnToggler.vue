@@ -40,7 +40,7 @@
                         <Draggable
                             v-model="state"
                             :disabled="enableSorting === false"
-                            class="flex flex-wrap p-4"
+                            class="flex flex-wrap p-4 space-y-2"
                             item-key="attribute"
                             :animation="150">
 
