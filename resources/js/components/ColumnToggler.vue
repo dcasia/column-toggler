@@ -40,14 +40,14 @@
                         <Draggable
                             v-model="state"
                             :disabled="enableSorting === false"
-                            class="flex flex-wrap p-4 space-y-1"
+                            class="flex flex-wrap p-4 space-y-2"
                             item-key="attribute"
                             :animation="150">
 
                             <template #item="{ element }">
 
                                 <CheckboxWithLabel
-                                    class="w-full leading-none whitespace-nowrap"
+                                    class="w-full whitespace-nowrap"
                                     v-if="element.label"
                                     :checked="element.visible"
                                     @click.stop
