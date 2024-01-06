@@ -13,8 +13,8 @@ class ColumnTogglerServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        Field::macro('hideByDefault', function () {
-            return $this->withMeta([ 'columnToggleVisible' => false ]);
+        Field::macro('hideByDefault', function ($hiddenByDefault = true) {
+            return $this->withMeta([ 'columnToggleVisible' => !$hiddenByDefault ]);
         });
 
         Nova::serving(function (ServingNova $event): void {
