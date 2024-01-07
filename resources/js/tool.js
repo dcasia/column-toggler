@@ -35,7 +35,7 @@ Nova.booting(app => {
                 container.classList.add('column-toggler')
 
                 const relationship = this.actionQueryString?.viaRelationship
-                const resourceName = this.resourceName
+                const resourceName = this.isLensView ? this.lens : this.resourceName
 
                 let target
 
