@@ -33,7 +33,7 @@ export function generateCacheKey(cacheKey) {
     return [
         'column-toggler',
         cacheKey,
-        Nova.$router.page.component,
+        Nova.app.component,
         Nova.config('column_toggler').enable_sorting,
     ].join('/')
 }
