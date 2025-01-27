@@ -1,14 +1,35 @@
 import ColumnToggler from './components/ColumnToggler.vue'
-import { registerMixin } from './components/ColumnToggler'
-import { createVNode, render } from 'vue'
+import {registerMixin} from './components/ColumnToggler'
+import {createVNode, render} from 'vue'
 
 try {
 
-    registerMixin(Nova.pages[ 'Nova.Lens' ].components[ 'ResourceLens' ])
+    const page = Nova.pages['Nova.Lens']
+    if (!page || typeof page.setup !== 'function') {
+        throw new Error('Nova.Lens page or setup function not found');
+    }
 
-} catch {
+    const originalSetup = page.setup;
 
-    console.error('ColumnToggler: Unable to register mixin for Lens view')
+    page.setup = (...args) => {
+        const result = originalSetup(...args);
+
+        if (typeof result === 'function') {
+            return (...renderArgs) => {
+                const vnode = result(...renderArgs);
+                if (vnode.type?.name === 'Lens') {
+                    registerMixin(vnode.type);
+                }
+
+                return vnode;
+            };
+        }
+
+        console.warn('Setup did not return a render function');
+        return result;
+    };
+} catch (e) {
+    console.error('ColumnToggler: Unable to register mixin for Lens view', e)
 
 }
 
@@ -17,7 +38,6 @@ Nova.booting(app => {
     const componentFn = app.component
 
     app.component = function (name, component) {
-
         if (name === 'ResourceIndex') {
             registerMixin(component)
         }
@@ -40,11 +60,11 @@ Nova.booting(app => {
                 let target
 
                 if (relationship) {
-                    target = `[dusk="${ resourceName }-index-component"][data-relationship="${ relationship }"] div.h-9.ml-auto.flex.items-center.pr-2.md\\:pr-3 > div.hidden.md\\:flex.px-2`
+                    target = `[dusk="${resourceName}-index-component"][data-relationship="${relationship}"] div.h-9.ml-auto.flex.items-center.pr-2.md\\:pr-3 > div.hidden.md\\:flex.px-2`
                 } else if (this.isLensView) {
-                    target = `[dusk="${ resourceName }-lens-component"] div.h-9.ml-auto.flex.items-center.pr-2.md\\:pr-3 > div.hidden.md\\:flex.px-2`
+                    target = `[dusk="${resourceName}-lens-component"] div.h-9.ml-auto.flex.items-center.pr-2.md\\:pr-3 > div.hidden.md\\:flex.px-2`
                 } else {
-                    target = `[dusk="${ resourceName }-index-component"] div.h-9.ml-auto.flex.items-center.pr-2.md\\:pr-3 > div.hidden.md\\:flex.px-2`
+                    target = `[dusk="${resourceName}-index-component"] div.h-9.ml-auto.flex.items-center.pr-2.md\\:pr-3 > div.hidden.md\\:flex.px-2`
                 }
 
                 const element = this._.vnode.el.querySelector(target)
@@ -53,7 +73,7 @@ Nova.booting(app => {
 
                     element.insertAdjacentElement('afterend', container)
 
-                    const vnode = createVNode(ColumnToggler, { tableToolbar: this })
+                    const vnode = createVNode(ColumnToggler, {tableToolbar: this})
                     vnode.appContext = app._context
 
                     render(vnode, container)
