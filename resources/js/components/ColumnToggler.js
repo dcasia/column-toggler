@@ -1,6 +1,5 @@
 import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
-import {router} from '@inertiajs/vue3'
 
 export function toList(state) {
     return state.filter(({visible}) => visible).map(({attribute}) => attribute)
