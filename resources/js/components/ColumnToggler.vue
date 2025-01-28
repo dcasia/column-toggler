@@ -143,14 +143,13 @@
             },
         },
         watch: {
-            'tableToolbar.resources'(resources) {
+            async 'tableToolbar.resources'(resources) {
 
                 const attributes = resources[ 0 ]?.columnToggler
 
                 if (attributes) {
 
-                    let localStorageState = getStateFromLocalStorage(this.tableToolbar.resourceName)
-
+                    let localStorageState = await getStateFromLocalStorage(this.tableToolbar.resourceName)
                     if (localStorageState && this.isDifferentState(attributes, localStorageState)) {
                         localStorageState = attributes
                     }
